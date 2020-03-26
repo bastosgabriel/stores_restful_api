@@ -60,7 +60,7 @@ class Item(Resource):
         # Search in items if new_item already exists
         for item in items:
             if item['name'].lower() == new_item['name'].lower():
-                item['price'] = new_item['price']
+                item.update(data)
                 return new_item, 200
 
         items.append(new_item)
