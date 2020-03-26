@@ -50,23 +50,29 @@ class Item(Resource):
         return new_item, 201
 
     def put(self, name):
+        data = request.get_json()
+
         new_item = {
             "name": name,
-            "price": 2.00
+            "price": data['price']
         }
 
         # Search in items if new_item already exists
         for item in items:
             if item['name'].lower() == new_item['name'].lower():
                 item['price'] = new_item['price']
-                return new_item
+                return new_item, 200
 
         items.append(new_item)
 
-        return new_item
+        return new_item, 201
 
-    #def del(self, name):
-    #    return
+    def delete(self, name):
+        for index, item in enumerate(items):
+            if item['name'].lower() == name.lower():
+                return items.pop(index), 200
+
+        return {'message': f"Item '{name}' does not exist!"}, 400
 
 
 api.add_resource(Items, '/items')
