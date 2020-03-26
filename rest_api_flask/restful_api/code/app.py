@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request
 from flask_restful import Resource, Api
 
 app = Flask(__name__)
@@ -19,25 +19,28 @@ class Items(Resource):
 class Item(Resource):
 
     def get(self, name):
+        # Search in items if new_item already exists
         for item in items:
             if item['name'].lower() == name.lower():
-                return item
-        return {'message': "Item not Found!"}
+                return item, 200
+        return {'item': None}, 404
 
     def post(self, name):
+        data = request.get_json()
+
         new_item = {
             "name": name,
-            "price": 12.00
+            "price": data['price']
         }
 
         # Search in items if new_item already exists
         for item in items:
             if item['name'].lower() == new_item['name'].lower():
-                return {'message': "Item already in items!"}
+                return {'message': f"An item named {item['name']} already in items!"}, 400
 
         items.append(new_item)
 
-        return new_item
+        return new_item, 201
 
     def put(self, name):
         new_item = {
@@ -59,10 +62,7 @@ class Item(Resource):
     #    return
 
 
-
-
-
 api.add_resource(Items, '/items')
 api.add_resource(Item, '/item/<string:name>')
 
-app.run()
+app.run(debug = True)
