@@ -1,5 +1,5 @@
 from flask import Flask, request
-from flask_restful import Resource, Api
+from flask_restful import Resource, Api, reqparse
 from flask_jwt import JWT, jwt_required
 
 from security import authenticate, identity
@@ -50,7 +50,14 @@ class Item(Resource):
         return new_item, 201
 
     def put(self, name):
-        data = request.get_json()
+        parser = reqparse.RequestParser()
+        parser.add_argument('price',
+            type = float,
+            required = True,
+            help = "This field is required!"
+        )
+
+        data = parser.parse_args()
 
         new_item = {
             "name": name,
