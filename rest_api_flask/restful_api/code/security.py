@@ -1,27 +1,11 @@
+from user import User
+
 users = [
-    {
-        'id': 1,
-        'username': 'bobi',
-        'password': 'senhadobob'
-    }
+    User(1, "bobi", "senhabobi")
 ]
 
-
-username_mapping = {
-    'bobi': {
-        'id': 1,
-        'username': 'bobi',
-        'password': 'senhadobob'
-    }
-}
-
-userid_mapping = {
-    1: {
-        'id': 1,
-        'username': 'bobi',
-        'password': 'senhadobob'
-    }
-}
+username_mapping = {u.username: u for u in users}
+userid_mapping = {u.id: u for u in users}
 
 def authenticate(username,password):
     user = username_mapping.get(username, None)
@@ -30,4 +14,4 @@ def authenticate(username,password):
 
 def identity(payload):
     user_id = payload['identity']
-    return userid_mapping.get(user_id, None)    
+    return userid_mapping.get(user_id, None)   
