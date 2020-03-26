@@ -23,6 +23,12 @@ class Items(Resource):
         return {'Items': items}
 
 class Item(Resource):
+    parser = reqparse.RequestParser()
+    parser.add_argument('price',
+        type = float,
+        required = True,
+        help = "This field is required!"
+    )
 
     @jwt_required()
     def get(self, name):
@@ -33,7 +39,7 @@ class Item(Resource):
         return {'item': None}, 404
 
     def post(self, name):
-        data = request.get_json()
+        data = Item.parser.parse_args()
 
         new_item = {
             "name": name,
@@ -50,14 +56,7 @@ class Item(Resource):
         return new_item, 201
 
     def put(self, name):
-        parser = reqparse.RequestParser()
-        parser.add_argument('price',
-            type = float,
-            required = True,
-            help = "This field is required!"
-        )
-
-        data = parser.parse_args()
+        data = Item.parser.parse_args()
 
         new_item = {
             "name": name,
