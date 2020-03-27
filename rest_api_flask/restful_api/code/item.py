@@ -69,25 +69,33 @@ class Item(Resource):
 
         return {"message": f"'{name}'' created successfully!"}, 201
 
-    '''
+    
     def put(self, name):
         data = Item.parser.parse_args()
 
-        new_item = {
-            "name": name,
-            "price": data['price']
-        }
+        connection = sqlite3.connect('store.db')
+        cursor = connection.cursor()
 
-        # Search in items if new_item already exists
-        for item in items:
-            if item['name'].lower() == name.lower():
-                item.update(data)
-                return new_item, 200
+        # Update item if item already exists
+        if Item.find_by_name(name):
+            update_query = "UPDATE items SET price=? WHERE name=?"
+            cursor.execute(update_query, (data['price'], name))
 
-        items.append(new_item)
+            connection.commit()
+            connection.close()
 
-        return new_item, 201
+            return {"message": f"'{name}' updated successfully!"}, 201
 
+        insert_query = "INSERT INTO items (name, price) VALUES (?, ?)"
+        cursor.execute(insert_query, (name, data['price']))
+
+        connection.commit()
+        connection.close()
+
+        return {"message": f"'{name}'' created successfully!"}, 201
+
+
+    '''
     def delete(self, name):
         for index, item in enumerate(items):
             if item['name'].lower() == name.lower():
