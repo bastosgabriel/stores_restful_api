@@ -4,6 +4,8 @@ from flask_jwt import JWT, jwt_required
 
 from security import authenticate, identity
 
+import sqlite3
+
 app = Flask(__name__)
 app.secret_key = 'bobiki'
 api = Api(app)
@@ -16,6 +18,7 @@ items = [
         "price": 10.99
     }
 ]
+
 
 class Items(Resource):
 
@@ -39,17 +42,18 @@ class Item(Resource):
         return {'item': None}, 404
 
     def post(self, name):
+        
+        # Search in items if the new item already exists
+        for item in items:
+            if item['name'].lower() == name.lower():
+                return {'message': f"An item named {item['name']} already in items!"}, 400
+
         data = Item.parser.parse_args()
 
         new_item = {
             "name": name,
             "price": data['price']
         }
-
-        # Search in items if new_item already exists
-        for item in items:
-            if item['name'].lower() == new_item['name'].lower():
-                return {'message': f"An item named {item['name']} already in items!"}, 400
 
         items.append(new_item)
 
@@ -65,7 +69,7 @@ class Item(Resource):
 
         # Search in items if new_item already exists
         for item in items:
-            if item['name'].lower() == new_item['name'].lower():
+            if item['name'].lower() == name.lower():
                 item.update(data)
                 return new_item, 200
 
