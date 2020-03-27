@@ -69,7 +69,7 @@ class Item(Resource):
 
         return {"message": f"'{name}'' created successfully!"}, 201
 
-    
+
     def put(self, name):
         data = Item.parser.parse_args()
 
@@ -95,11 +95,20 @@ class Item(Resource):
         return {"message": f"'{name}'' created successfully!"}, 201
 
 
-    '''
+    
     def delete(self, name):
-        for index, item in enumerate(items):
-            if item['name'].lower() == name.lower():
-                return items.pop(index), 200
+        connection = sqlite3.connect('store.db')
+        cursor = connection.cursor()
+
+        # Update item if item already exists
+        if Item.find_by_name(name):
+            delete_query = "DELETE FROM items WHERE name=?"
+            cursor.execute(delete_query, (name,))
+
+            connection.commit()
+            connection.close()
+
+            return {"message": f"'{name}' deleted successfully!"}, 200
 
         return {'message': f"Item '{name}' does not exist!"}, 400
-    '''
+    
