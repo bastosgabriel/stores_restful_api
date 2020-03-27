@@ -51,10 +51,10 @@ class Item(Resource):
             return {'item': Item.find_by_name(name)}, 200
         else:
             return {'item': None}, 404
-    '''
+    
     def post(self, name):
         if Item.find_by_name(name):
-            return {'message': f"An item named {name} already exists!"}, 400
+            return {'message': f"An item named '{name}' already exists!"}, 400
 
         data = Item.parser.parse_args()
 
@@ -62,15 +62,14 @@ class Item(Resource):
         cursor = connection.cursor()
 
         insert_query = "INSERT INTO items (name, price) VALUES (?, ?)"
-        result = cursor.execute(insert_query, (name, data['price']))
-        result.fetchone()
+        cursor.execute(insert_query, (name, data['price']))
 
         connection.commit()
         connection.close()
 
-        return {"item": result}, 201
+        return {"message": f"'{name}'' created successfully!"}, 201
 
-    
+    '''
     def put(self, name):
         data = Item.parser.parse_args()
 
