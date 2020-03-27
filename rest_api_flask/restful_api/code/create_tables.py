@@ -8,6 +8,7 @@ create_users_table = "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, 
 create_items_table = "CREATE TABLE IF NOT EXISTS items (id INTEGER PRIMARY KEY, name text, price smallmoney)"
 
 cursor.execute(create_users_table)
+cursor.execute(create_items_table)
 
 connection.commit()
 connection.close()
