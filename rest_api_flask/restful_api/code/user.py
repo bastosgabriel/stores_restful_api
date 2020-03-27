@@ -66,8 +66,10 @@ class UserRegister(Resource):
 
         user = UserRegister.parser.parse_args()
 
-        insert_query = "INSERT INTO users (username, password) VALUES (?, ?)"
+        if User.find_by_username(user['username']):
+            return {"message": f"User '{user['username']} already exists!"}, 400
 
+        insert_query = "INSERT INTO users (username, password) VALUES (?, ?)"
         cursor.execute(insert_query, (user['username'], user['password']))
 
         connection.commit()
