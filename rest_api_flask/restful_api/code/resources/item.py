@@ -71,7 +71,7 @@ class Item(Resource):
         connection.commit()
         connection.close()
         
-    #@jwt_required()
+    @jwt_required()
     def get(self, name):
         if Item.find_by_name(name):
 
