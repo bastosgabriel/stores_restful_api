@@ -4,6 +4,8 @@ from flask_jwt import jwt_required
 
 from models.item import ItemModel
 
+STORE_DB = 'store.db'
+
 class Items(Resource):
     
     def get(self):
@@ -31,23 +33,23 @@ class Item(Resource):
         help = "This field is required!"
     )
   
-    @jwt_required()
+    #@jwt_required()
     def get(self, name):
-        if ItemModel.find_by_name(name):
+        if ItemModel.find_by_name(name, STORE_DB):
 
-            return {'item': ItemModel.find_by_name(name)}, 200
+            return {'item': ItemModel.find_by_name(name, STORE_DB).json()}, 200
         else:
             return {'item': None}, 404
     
     def post(self, name):
-        if ItemModel.find_by_name(name):
+        if ItemModel.find_by_name(name, STORE_DB):
             return {'message': f"An item named '{name}' already exists!"}, 400
 
         data = Item.parser.parse_args()
+        item = ItemModel(name, data['price'])
 
-        item = {'name': name, 'price': data['price']}
         try:
-            ItemModel.insert(item)
+            item.insert(STORE_DB)
         except Exception as err:
             return {"message": f"Could not insert the item: {err}"}, 500
 
@@ -56,19 +58,19 @@ class Item(Resource):
 
     def put(self, name):
         data = Item.parser.parse_args()
-        item = {'name': name, 'price': data['price']}
+        item = ItemModel(name, data['price'])
 
         # Update item if item already exists
-        if ItemModel.find_by_name(name):
+        if ItemModel.find_by_name(name, STORE_DB):
             try:
-                ItemModel.update(item)
+                item.update(STORE_DB)
             except Exception as err:
                 return {"message": f"Could not update the item: {err}"}, 500
 
             return {"message": f"'{name}' updated successfully!"}, 201
         else:
             try:
-                ItemModel.insert(item)
+                item.insert(STORE_DB)
             except Exception as err:
                 return {"message": f"Could not insert the item: {err}"}, 500
 
@@ -79,7 +81,7 @@ class Item(Resource):
         cursor = connection.cursor()
 
         # Update item if item already exists
-        if ItemModel.find_by_name(name):
+        if ItemModel.find_by_name(name, STORE_DB):
             delete_query = "DELETE FROM items WHERE name=?"
             cursor.execute(delete_query, (name,))
 
