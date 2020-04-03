@@ -1,4 +1,3 @@
-import sqlite3
 from flask_restful import Resource, reqparse
 
 from models.user import UserModel
@@ -18,33 +17,20 @@ class UserRegister(Resource):
                         )
 
     def post(self):
-        connection = sqlite3.connect('store.db')
-        cursor = connection.cursor()
+        data = UserRegister.parser.parse_args()
+        user = UserModel(**data)
 
-        user = UserRegister.parser.parse_args()
+        if UserModel.find_by_username(data['username']):
+            return {"message": f"User '{data['username']} already exists!"}, 400
 
-        if UserModel.find_by_username(user['username']):
-            return {
-                    "message": f"User '{user['username']} already exists!"}, 400
+        try:
+            user.save_to_db()
+        except Exception as err:
+            return {"message": f"Could not insert the item: {err}"}, 500
 
-        insert_query = "INSERT INTO users (username, password) VALUES (?, ?)"
-        cursor.execute(insert_query, (user['username'], user['password']))
+        return {"message": f"{data['username']} created successfully!"}, 201
+        
 
-        connection.commit()
-        connection.close()
-
-        return {"message": f"{user['username']} created successfully!"}, 201
 
     def get(self):  # THIS METHOD IS JUST FOR TESTING
-        connection = sqlite3.connect('store.db')
-        cursor = connection.cursor()
-
-        select_query = "SELECT * FROM users"
-
-        result = cursor.execute(select_query)
-        rows = result.fetchall()
-
-        connection.commit()
-        connection.close()
-
-        return rows
+        return UserModel.query.all()     
