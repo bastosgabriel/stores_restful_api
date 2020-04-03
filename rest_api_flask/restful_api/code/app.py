@@ -11,7 +11,7 @@ from resources.item import Item, Items
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:////home/bastosgabriel/code/python_exercises/rest_api_flask/restful_api/code/store.db"
+app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:////home/bastosgabriel/code/python_exercises/flask/restful_api/code/store.db"
 
 
 app.secret_key = 'bobiki'
