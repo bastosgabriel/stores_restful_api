@@ -3,18 +3,19 @@ from flask_restful import Resource, reqparse
 
 from models.user import UserModel
 
+
 class UserRegister(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument('username',
-        type = str,
-        required = True,
-        help = "Username is required!"
-    )
+                        type=str,
+                        required=True,
+                        help="Username is required!"
+                        )
     parser.add_argument('password',
-        type = str,
-        required = True,
-        help = "Password is required!"
-    )
+                        type=str,
+                        required=True,
+                        help="Password is required!"
+                        )
 
     def post(self):
         connection = sqlite3.connect('store.db')
@@ -23,7 +24,8 @@ class UserRegister(Resource):
         user = UserRegister.parser.parse_args()
 
         if UserModel.find_by_username(user['username']):
-            return {"message": f"User '{user['username']} already exists!"}, 400
+            return {
+                    "message": f"User '{user['username']} already exists!"}, 400
 
         insert_query = "INSERT INTO users (username, password) VALUES (?, ?)"
         cursor.execute(insert_query, (user['username'], user['password']))
@@ -33,12 +35,10 @@ class UserRegister(Resource):
 
         return {"message": f"{user['username']} created successfully!"}, 201
 
-    '''
-    # THIS METHOD IS JUST FOR TESTING
-    def get(self): 
+    def get(self):  # THIS METHOD IS JUST FOR TESTING
         connection = sqlite3.connect('store.db')
         cursor = connection.cursor()
-        
+
         select_query = "SELECT * FROM users"
 
         result = cursor.execute(select_query)
@@ -48,6 +48,3 @@ class UserRegister(Resource):
         connection.close()
 
         return rows
-    '''
-
-        

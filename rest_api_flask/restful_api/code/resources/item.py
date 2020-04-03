@@ -1,94 +1,81 @@
 import sqlite3
 from flask_restful import Resource, reqparse
 from flask_jwt import jwt_required
+from flask import jsonify
 
 from models.item import ItemModel
 
-STORE_DB = 'store.db'
 
 class Items(Resource):
-    
+
+    @jwt_required()
     def get(self):
-        connection = sqlite3.connect('store.db')
-        cursor = connection.cursor()
+        items = ItemModel.query.all()
+        
+        items_list = []
+        for item in items:
+            items_list.append({'name': item.name,'price': item.price})
 
-        select_query = "SELECT * FROM items"
-        result = cursor.execute(select_query)
-        rows = result.fetchall()
+        return {'items': items_list}, 200
 
-        items = []
-        for row in rows:
-            items.append({'name': row[1], 'price': float(row[2])})
-
-        connection.commit()
-        connection.close()
-
-        return {"items": items}, 200
 
 class Item(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument('price',
-        type = float,
-        required = True,
-        help = "This field is required!"
-    )
-  
-    #@jwt_required()
-    def get(self, name):
-        if ItemModel.find_by_name(name, STORE_DB):
+                        type=float,
+                        required=True,
+                        help="This field is required!"
+                        )
 
-            return {'item': ItemModel.find_by_name(name, STORE_DB).json()}, 200
+    @jwt_required()
+    def get(self, name):
+        if ItemModel.find_by_name(name):
+            return {'item': ItemModel.find_by_name(name).json()}, 200
         else:
             return {'item': None}, 404
-    
+
+    @jwt_required()
     def post(self, name):
-        if ItemModel.find_by_name(name, STORE_DB):
+        if ItemModel.find_by_name(name):
             return {'message': f"An item named '{name}' already exists!"}, 400
 
         data = Item.parser.parse_args()
         item = ItemModel(name, data['price'])
 
         try:
-            item.insert(STORE_DB)
+            item.save_to_db()
         except Exception as err:
             return {"message": f"Could not insert the item: {err}"}, 500
 
-
         return {"message": f"'{name}'' created successfully!"}, 201
 
+    @jwt_required()
     def put(self, name):
         data = Item.parser.parse_args()
-        item = ItemModel(name, data['price'])
-
-        # Update item if item already exists
-        if ItemModel.find_by_name(name, STORE_DB):
-            try:
-                item.update(STORE_DB)
-            except Exception as err:
-                return {"message": f"Could not update the item: {err}"}, 500
-
-            return {"message": f"'{name}' updated successfully!"}, 201
-        else:
-            try:
-                item.insert(STORE_DB)
-            except Exception as err:
-                return {"message": f"Could not insert the item: {err}"}, 500
-
-            return {"message": f"'{name}'' created successfully!"}, 201
     
+        if ItemModel.find_by_name(name):  # Uppdate item
+            item = ItemModel.find_by_name(name)
+            item.price = data['price']
+            item.save_to_db()
+            return {'message': f"{name} updated successfully!"}, 200
+
+        try:
+            item = ItemModel(name, data['price'])
+            item.save_to_db()
+        except Exception as err:
+            return {"message": f"Could not insert the item: {err}"}, 500
+
+        return {"message": f"'{name}' inserted successfully!"}, 201
+
+    @jwt_required()
     def delete(self, name):
-        connection = sqlite3.connect('store.db')
-        cursor = connection.cursor()
-
-        # Update item if item already exists
-        if ItemModel.find_by_name(name, STORE_DB):
-            delete_query = "DELETE FROM items WHERE name=?"
-            cursor.execute(delete_query, (name,))
-
-            connection.commit()
-            connection.close()
+        if ItemModel.find_by_name(name):
+            item = ItemModel.find_by_name(name)
+            try:
+                item.delete()
+            except Exception as err:
+                return {"message": f"Could not delete the item: {err}"}, 500
 
             return {"message": f"'{name}' deleted successfully!"}, 200
 
         return {'message': f"Item '{name}' does not exist!"}, 400
-    
