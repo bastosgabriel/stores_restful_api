@@ -19,7 +19,7 @@ class Item(Resource):
                         required=True,
                         help="This field is required!"
                         )
-    parser.add_argument('store',
+    parser.add_argument('store_id',
                         type=int,
                         required=True,
                         help="Every item needs a store id!"
@@ -51,7 +51,7 @@ class Item(Resource):
     def put(self, name):
         data = Item.parser.parse_args()
     
-        if ItemModel.find_by_name(name):  # Uppdate item
+        if ItemModel.find_by_name(name):  # Update item
             item = ItemModel.find_by_name(name)
             item.price = data['price']
             item.save_to_db()

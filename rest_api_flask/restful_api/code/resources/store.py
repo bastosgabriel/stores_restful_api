@@ -31,7 +31,7 @@ class Store(Resource):
 
 
 class Stores(Resource):
-    def get(self,name):
-        stores = {'stores': [store.json() for store in StoreModel.query.all()]}, 200
+    def get(self):
+        return {'stores': [store.json() for store in StoreModel.query.all()]}, 200
 
         
