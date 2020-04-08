@@ -9,13 +9,7 @@ class Items(Resource):
 
     @jwt_required()
     def get(self):
-        items = ItemModel.query.all()
-        
-        items_list = []
-        for item in items:
-            items_list.append({'name': item.name,'price': item.price})
-
-        return {'items': items_list}, 200
+        return {'items': [item.json() for item in ItemModel.query.all()]}, 200
 
 
 class Item(Resource):
@@ -24,6 +18,11 @@ class Item(Resource):
                         type=float,
                         required=True,
                         help="This field is required!"
+                        )
+    parser.add_argument('store',
+                        type=int,
+                        required=True,
+                        help="Every item needs a store id!"
                         )
 
     @jwt_required()
@@ -39,7 +38,7 @@ class Item(Resource):
             return {'message': f"An item named '{name}' already exists!"}, 400
 
         data = Item.parser.parse_args()
-        item = ItemModel(name, data['price'])
+        item = ItemModel(name, data['price'], data['store_id'])
 
         try:
             item.save_to_db()
@@ -59,7 +58,7 @@ class Item(Resource):
             return {'message': f"{name} updated successfully!"}, 200
 
         try:
-            item = ItemModel(name, data['price'])
+            item = ItemModel(name, data['price'], data['store_id'])
             item.save_to_db()
         except Exception as err:
             return {"message": f"Could not insert the item: {err}"}, 500
