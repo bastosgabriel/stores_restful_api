@@ -7,7 +7,6 @@ from models.item import ItemModel
 
 class Items(Resource):
 
-    @jwt_required()
     def get(self):
         return {'items': [item.json() for item in ItemModel.query.all()]}, 200
 
@@ -25,7 +24,6 @@ class Item(Resource):
                         help="Every item needs a store id!"
                         )
 
-    @jwt_required()
     def get(self, name):
         if ItemModel.find_by_name(name):
             return {'item': ItemModel.find_by_name(name).json()}, 200

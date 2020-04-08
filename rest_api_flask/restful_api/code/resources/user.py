@@ -31,6 +31,6 @@ class UserRegister(Resource):
         return {"message": f"{data['username']} created successfully!"}, 201
         
 
-
+    @jwt_required()
     def get(self):  # THIS METHOD IS JUST FOR TESTING
         return UserModel.query.all()     
