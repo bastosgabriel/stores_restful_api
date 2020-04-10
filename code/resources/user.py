@@ -34,4 +34,5 @@ class UserRegister(Resource):
 
     @jwt_required()
     def get(self):  # THIS METHOD IS JUST FOR TESTING
-        return UserModel.query.all()     
+        return {'users': [user.json() for user in UserModel.query.all()]}, 200
+        

@@ -12,6 +12,9 @@ class UserModel(db.Model):
         self.username = username
         self.password = password
 
+    def json(self) -> dict:
+        return {'username': self.username, 'password': '*****'}
+
     def save_to_db(self) -> None:
         db.session.add(self)
         db.session.commit()
