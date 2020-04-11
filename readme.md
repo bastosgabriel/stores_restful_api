@@ -16,3 +16,7 @@ And the following models: ItemModel, UserModel and StoreModel
 * [Flask-JWT](https://pythonhosted.org/Flask-JWT/) - Used for user authentication
 * [sqlite3](https://www.sqlite.org/index.html) - SQL database engine
 * [SQLAlchemy](https://www.sqlalchemy.org/) - SQL toolkit and Object Relational Mapper
+
+### Deployed with
+* [Heroku](https://www.heroku.com/) - Cloud platform
+
