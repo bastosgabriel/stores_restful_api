@@ -26,6 +26,43 @@ def add_claims_to_jwt(identity):
     return {'is_admin': False}
 
 
+# The following callbacks are used for customizing jwt response/error messages.
+
+@jwt.expired_token_loader
+def expired_token_callback():
+    return {
+        'description': 'The token has expired. :(',
+        'error': 'token_expired'
+    }, 401
+
+@jwt.invalid_token_loader
+def invalid_token_callback(error):
+    return {
+        'description': 'Signature verification failed. Did you try something?',
+        'error': 'invalid_token'
+    }, 401
+
+@jwt.unauthorized_loader
+def unauthorized_token_callback(error):
+    return {
+        'description': 'Request does not contain an access token. Did you forget something?',
+        'error': 'unauthorization_required'
+    }, 401
+
+@jwt.needs_fresh_token_loader
+def needs_fresh_token_callback():
+    return {
+        'description': 'This token is not fresh. :(',
+        'error': 'fresh_token_required'
+    }, 401
+
+@jwt.revoked_token_loader
+def revoked_token_callback():
+    return {
+        'description': 'The token has been revoked!',
+        'error': 'token_revoked'
+    }, 401
+
 api.add_resource(Items, '/items')
 api.add_resource(Item, '/item/<string:name>')
 api.add_resource(UserRegister, '/register')
