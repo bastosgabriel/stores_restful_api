@@ -3,7 +3,7 @@ I made this API just for learning purposes.
 
 ## Resources and models
 
-It contains the following resources: Item, Items, Store, Stores and UserRegister  
+It contains the following resources: Item, Items, Store, Stores, UserRegister, UserLogin, UserLogout and TokenRefresh
 And the following models: ItemModel, UserModel and StoreModel
 
 
@@ -13,7 +13,7 @@ And the following models: ItemModel, UserModel and StoreModel
 ## Built With
 
 * [Flask-RESTful](https://flask-restful.readthedocs.io/en/latest/) - Used to create the RESTful API
-* [Flask-JWT](https://pythonhosted.org/Flask-JWT/) - Used for user authentication
+* [Flask-JWT-Extended](https://flask-jwt-extended.readthedocs.io/en/stable/) - Adds support for JSON Web Tokens
 * [sqlite3](https://www.sqlite.org/index.html) - SQL database engine
 * [SQLAlchemy](https://www.sqlalchemy.org/) - SQL toolkit and Object Relational Mapper
 
