@@ -1,5 +1,5 @@
 from flask_restful import Resource, reqparse
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_claims, jwt_optional, get_jwt_identity
 from flask import jsonify
 
 from models.item import ItemModel
@@ -7,8 +7,15 @@ from models.item import ItemModel
 
 class Items(Resource):
 
+    @jwt_optional
     def get(self):
-        return {'items': [item.json() for item in ItemModel.query.all()]}, 200
+        user_id = get_jwt_identity()
+        items = [item.json() for item in ItemModel.find_all()]
+
+        if user_id:
+            return {'items': items}, 200
+
+        return {'items': [item['name'] for item in items]}, 200
 
 
 class Item(Resource):
@@ -65,6 +72,11 @@ class Item(Resource):
 
     @jwt_required
     def delete(self, name):
+
+        claims = get_jwt_claims()
+        if not claims['is_admin']:
+            return {'message': 'Admin privilege is required.'}, 401
+
         if ItemModel.find_by_name(name):
             item = ItemModel.find_by_name(name)
             try:
