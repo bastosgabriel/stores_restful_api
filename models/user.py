@@ -13,10 +13,14 @@ class UserModel(db.Model):
         self.password = password
 
     def json(self) -> dict:
-        return {'username': self.username, 'password': '*****'}
+        return {'id': self.id, 'username': self.username}
 
     def save_to_db(self) -> None:
         db.session.add(self)
+        db.session.commit()
+
+    def delete_from_db(self) -> None:
+        db.session.delete(self)
         db.session.commit()
 
     @classmethod
@@ -25,4 +29,4 @@ class UserModel(db.Model):
 
     @classmethod
     def find_by_id(cls, _id):
-        return cls.query.filter_by(id=_id)
+        return cls.query.filter_by(id=_id).first()  # filter_by always returns a list, thats why .first() is necessary

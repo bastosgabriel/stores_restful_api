@@ -36,3 +36,24 @@ class UserRegister(Resource):
     def get(self):  # THIS METHOD IS JUST FOR TESTING
         return {'users': [user.json() for user in UserModel.query.all()]}, 200
         
+class User(Resource):
+
+    @classmethod
+    def get(cls, user_id):
+        user = UserModel.find_by_id(user_id)
+        if not user:
+            return {'message': 'User not found'}, 404
+
+        return {'user': user.json()}, 200
+
+    @classmethod
+    def delete(cls, user_id):
+        user = UserModel.find_by_id(user_id)
+        if not user:
+            return {'message': 'User not found'}, 404
+
+        try:
+            user.delete_from_db()
+            return {'message': f'{user.json()} successfully deleted.'}, 200
+        except:
+            return {'message': f'Could not delete {user.json()}'}, 500
