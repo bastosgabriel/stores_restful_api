@@ -1,5 +1,5 @@
 from flask_restful import Resource, reqparse
-from flask_jwt import jwt_required
+from flask_jwt_extended import jwt_required
 from flask import jsonify
 
 from models.item import ItemModel
@@ -30,7 +30,7 @@ class Item(Resource):
         else:
             return {'item': None}, 404
 
-    @jwt_required()
+    @jwt_required
     def post(self, name):
         if ItemModel.find_by_name(name):
             return {'message': f"An item named '{name}' already exists!"}, 400
@@ -45,7 +45,7 @@ class Item(Resource):
 
         return {"message": f"'{name}'' created successfully!"}, 201
 
-    @jwt_required()
+    @jwt_required
     def put(self, name):
         data = Item.parser.parse_args()
     
@@ -63,7 +63,7 @@ class Item(Resource):
 
         return {"message": f"'{name}' inserted successfully!"}, 201
 
-    @jwt_required()
+    @jwt_required
     def delete(self, name):
         if ItemModel.find_by_name(name):
             item = ItemModel.find_by_name(name)

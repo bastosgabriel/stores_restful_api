@@ -1,24 +1,25 @@
 from flask_restful import Resource, reqparse
-from flask_jwt import jwt_required
+from werkzeug.security import safe_str_cmp
+from flask_jwt_extended import create_access_token, create_refresh_token
 
 from models.user import UserModel
 
-
+_user_parser = reqparse.RequestParser()
+_user_parser.add_argument('username',
+                    type=str,
+                    required=True,
+                    help="Username is required!"
+                    )
+_user_parser.add_argument('password',
+                    type=str,
+                    required=True,
+                    help="Password is required!"
+                    )
+                        
 class UserRegister(Resource):
-    parser = reqparse.RequestParser()
-    parser.add_argument('username',
-                        type=str,
-                        required=True,
-                        help="Username is required!"
-                        )
-    parser.add_argument('password',
-                        type=str,
-                        required=True,
-                        help="Password is required!"
-                        )
-
+    
     def post(self):
-        data = UserRegister.parser.parse_args()
+        data = _user_parser.parse_args()
         user = UserModel(**data)
 
         if UserModel.find_by_username(data['username']):
@@ -30,14 +31,9 @@ class UserRegister(Resource):
             return {"message": f"Could not insert the item: {err}"}, 500
 
         return {"message": f"{data['username']} created successfully!"}, 201
-        
-
-    @jwt_required()
-    def get(self):  # THIS METHOD IS JUST FOR TESTING
-        return {'users': [user.json() for user in UserModel.query.all()]}, 200
-        
+              
 class User(Resource):
-
+    
     @classmethod
     def get(cls, user_id):
         user = UserModel.find_by_id(user_id)
@@ -57,3 +53,22 @@ class User(Resource):
             return {'message': f'{user.json()} successfully deleted.'}, 200
         except:
             return {'message': f'Could not delete {user.json()}'}, 500
+
+class UserLogin(Resource):
+    
+    @classmethod
+    def post(cls):
+        data = _user_parser.parse_args()
+
+        user = UserModel.find_by_username(data['username'])
+        
+        if user and safe_str_cmp(user.password, data['password']):
+            access_token = create_access_token(identity=user.id, fresh=True)
+            refresh_token = create_refresh_token(user.id)
+            return {
+                'access_token': access_token,
+                'refresh_token': refresh_token
+            }, 200
+
+        return {'message': 'Invalid credentials. Nice try.'}, 401
+       
