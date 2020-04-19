@@ -20,7 +20,12 @@ class ItemModel(db.Model):
     {'name': <itemname>, 'price': <itemprice>}
     '''
     def json(self) -> dict:
-        return {'name': self.name, 'price': self.price}
+        return { 
+            'id': self.id,
+            'name': self.name, 
+            'price': self.price, 
+            'store': self.store_id 
+        }
 
     @classmethod
     def find_by_name(cls, name):

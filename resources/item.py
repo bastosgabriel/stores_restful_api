@@ -36,7 +36,7 @@ class Item(Resource):
             return {'message': f"An item named '{name}' already exists!"}, 400
 
         data = Item.parser.parse_args()
-        item = ItemModel(name, data['price'], data['store_id'])
+        item = ItemModel(name, **data)
 
         try:
             item.save_to_db()
@@ -56,7 +56,7 @@ class Item(Resource):
             return {'message': f"{name} updated successfully!"}, 200
 
         try:
-            item = ItemModel(name, data['price'], data['store_id'])
+            item = ItemModel(name, **data)
             item.save_to_db()
         except Exception as err:
             return {"message": f"Could not insert the item: {err}"}, 500
