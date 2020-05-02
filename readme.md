@@ -8,7 +8,7 @@ And the following models: ItemModel, UserModel and StoreModel
 
 
 ## Endpoints
-*I'll document this one day*
+*I'll document this some day*
 
 ## Built With
 
